@@ -105,7 +105,7 @@ unsigned OpenNIDriver::updateDeviceList () throw ()
       if ( connection_string_map_.count ((*neededIt).GetCreationInfo ()) )
       {
         unsigned device_index = connection_string_map_[(*neededIt).GetCreationInfo ()];
-        device_context_[device_index].depth_node.reset (new xn::NodeInfo(*nodeIt));
+        device_context_[device_index].depth_node = new xn::NodeInfo(*nodeIt);
       }
     }
   }
@@ -128,7 +128,7 @@ unsigned OpenNIDriver::updateDeviceList () throw ()
         if ( connection_string_map_.count ((*neededIt).GetCreationInfo ()) )
         {
           unsigned device_index = connection_string_map_[(*neededIt).GetCreationInfo ()];
-          device_context_[device_index].image_node.reset (new xn::NodeInfo(*nodeIt));
+          device_context_[device_index].image_node = new xn::NodeInfo(*nodeIt);
         }
       }
     }
@@ -148,7 +148,7 @@ unsigned OpenNIDriver::updateDeviceList () throw ()
       if ( connection_string_map_.count ((*neededIt).GetCreationInfo ()) )
       {
         unsigned device_index = connection_string_map_[(*neededIt).GetCreationInfo ()];
-        device_context_[device_index].ir_node.reset (new xn::NodeInfo(*nodeIt));
+        device_context_[device_index].ir_node = new xn::NodeInfo(*nodeIt);
       }
     }
   }
@@ -194,7 +194,7 @@ unsigned OpenNIDriver::updateDeviceList () throw ()
     }
     else
 #endif
-    if (vendor_id == 0x1d27 && device_context_[deviceIdx].image_node.get () == 0)
+    if (vendor_id == 0x1d27 && device_context_[deviceIdx].image_node == 0)
     {
       strcpy ((char*)device_context_[deviceIdx].device_node.GetDescription().strVendor, "ASUS");
       strcpy ((char*)device_context_[deviceIdx].device_node.GetDescription().strName, "Xtion Pro");
@@ -244,14 +244,17 @@ boost::shared_ptr<OpenNIDevice> OpenNIDriver::getDeviceByIndex (unsigned index) 
 
     if (vendor_id == 0x45e)
     {
+      std::cout << "here" << std::endl;
       device = boost::shared_ptr<OpenNIDevice > (new DeviceKinect (context_, device_context_[index].device_node,
                                                                    *device_context_[index].image_node, *device_context_[index].depth_node,
                                                                    *device_context_[index].ir_node));
+      std::cout << "here-1" << std::endl;
       device_context_[index].device = device;
+      std::cout << "here0" << std::endl;
     }
     else if (vendor_id == 0x1d27)
     {
-      if (device_context_[index].image_node.get())
+      if (device_context_[index].image_node)
         device = boost::shared_ptr<OpenNIDevice > (new DevicePrimesense (context_, device_context_[index].device_node,
                                                                          *device_context_[index].image_node, *device_context_[index].depth_node,
                                                                          *device_context_[index].ir_node));
@@ -497,10 +500,13 @@ OpenNIDriver::DeviceContext::DeviceContext (const xn::NodeInfo& device, xn::Node
 
 OpenNIDriver::DeviceContext::DeviceContext (const xn::NodeInfo& device)
 : device_node (device)
-, image_node ((xn::NodeInfo*)0)
-, depth_node ((xn::NodeInfo*)0)
-, ir_node ((xn::NodeInfo*)0)
+// , image_node ((xn::NodeInfo*)0)
+// , depth_node ((xn::NodeInfo*)0)
+// , ir_node ((xn::NodeInfo*)0)
 {
+  image_node = new xn::NodeInfo(0);
+  depth_node = new xn::NodeInfo(0);
+  ir_node = new xn::NodeInfo(0);
 }
 
 OpenNIDriver::DeviceContext::DeviceContext (const DeviceContext& other)
@@ -510,6 +516,7 @@ OpenNIDriver::DeviceContext::DeviceContext (const DeviceContext& other)
 , ir_node (other.ir_node)
 , device (other.device)
 {
+
 }
 
 } // namespace

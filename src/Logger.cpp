@@ -107,9 +107,12 @@ void Logger::setupDevice(const std::string & deviceId)
         {
             if(deviceId[0] == '#')
             {
+                std::cout << deviceId << std::endl;
                 unsigned int index = boost::lexical_cast<unsigned int>(deviceId.substr(1));
+                // std::cout << "index: " << index << std::endl;
                 std::cout << boost::format("searching for device with index = %d") % index << std::endl;
-                m_device = driver.getDeviceByIndex(index - 1);
+                m_device = driver.getDeviceByIndex(index);
+                std::cout << "here1" << std::endl;
                 break;
             }
         }

@@ -50,11 +50,14 @@ DeviceKinect::DeviceKinect (xn::Context& context, const xn::NodeInfo& device_nod
 : OpenNIDevice (context, device_node, image_node, depth_node, ir_node)
 , debayering_method_ (ImageBayerGRBG::EdgeAwareWeighted)
 {
+  std::cout << "1" << std::endl;
   // setup stream modes
   enumAvailableModes ();
   setDepthOutputMode (getDefaultDepthMode ());
   setImageOutputMode (getDefaultImageMode ());
   setIROutputMode (getDefaultIRMode ());
+
+  std::cout << "2" << std::endl;
   
   // device specific initialization
   XnStatus status;
@@ -62,20 +65,29 @@ DeviceKinect::DeviceKinect (xn::Context& context, const xn::NodeInfo& device_nod
   unique_lock<mutex> image_lock(image_mutex_);
   // set kinect specific format. Thus input = uncompressed Bayer, output = grayscale = bypass = bayer
   status = image_generator_.SetIntProperty ("InputFormat", 6);
+
+  std::cout << "3" << std::endl;
+
   if (status != XN_STATUS_OK)
     THROW_OPENNI_EXCEPTION ("Error setting the image input format to Uncompressed 8-bit BAYER. Reason: %s", xnGetStatusString (status));
+  
+  std::cout << "4" << std::endl;
 
   // Grayscale: bypass debayering -> gives us bayer pattern!
   status = image_generator_.SetPixelFormat (XN_PIXEL_FORMAT_GRAYSCALE_8_BIT);
   if (status != XN_STATUS_OK)
     THROW_OPENNI_EXCEPTION ("Failed to set image pixel format to 8bit-grayscale. Reason: %s", xnGetStatusString (status));
   image_lock.unlock ();
+
+  std::cout << "5" << std::endl;
   
   lock_guard<mutex> depth_lock(depth_mutex_);
   // RegistrationType should be 2 (software) for Kinect, 1 (hardware) for PS
   status = depth_generator_.SetIntProperty ("RegistrationType", 2);
   if (status != XN_STATUS_OK)
     THROW_OPENNI_EXCEPTION ("Error setting the registration type. Reason: %s", xnGetStatusString (status));
+
+  std::cout << "6" << std::endl;
 }
 
 DeviceKinect::~DeviceKinect () throw ()
